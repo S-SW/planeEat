@@ -1,45 +1,41 @@
 package com.example.planeat.ui.screens
 
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 
-enum class Screen(val title: String) {
-    Diet("饮食"),
-    Workout("训练"),
-    Profile("我的")
+// 四个主要看板的枚举定义
+enum class AppScreen(val title: String, val icon: String) {
+    Home("今日首屏", "🏠"),
+    Reminders("提醒设置", "⏰"),
+    Analytics("历史与分析", "📊"),
+    Profile("个人中心", "👤")
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen() {
-    var currentScreen by remember { mutableStateOf(Screen.Diet) }
+    var currentScreen by remember { mutableStateOf(AppScreen.Home) }
 
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(currentScreen.title) })
+            TopAppBar(
+                title = { Text(currentScreen.title) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                )
+            )
         },
         bottomBar = {
             NavigationBar {
-                Screen.values().forEach { screen ->
+                AppScreen.values().forEach { screen ->
                     NavigationBarItem(
                         selected = currentScreen == screen,
                         onClick = { currentScreen = screen },
                         label = { Text(screen.title) },
-                        icon = {
-                            // 针对纯前端进行硬编码图标，绝对不会产生 unresolved reference 报错
-                            val iconImage = when(screen) {
-                                Screen.Diet -> Icons.Default.List
-                                Screen.Workout -> Icons.Default.PlayArrow
-                                Screen.Profile -> Icons.Default.AccountCircle
-                            }
-                            Icon(iconImage, contentDescription = screen.title)
-                        }
+                        icon = { Text(screen.icon, style = MaterialTheme.typography.titleLarge) }
                     )
                 }
             }
@@ -47,9 +43,10 @@ fun MainScreen() {
     ) { innerPadding ->
         Surface(modifier = Modifier.padding(innerPadding)) {
             when (currentScreen) {
-                Screen.Diet -> DietScreen()
-                Screen.Workout -> WorkoutScreen()
-                Screen.Profile -> ProfileScreen()
+                AppScreen.Home -> HomeScreen()
+                AppScreen.Reminders -> RemindersScreen()
+                AppScreen.Analytics -> AnalyticsScreen()
+                AppScreen.Profile -> ProfileScreen()
             }
         }
     }
